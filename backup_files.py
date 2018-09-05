@@ -36,9 +36,7 @@ def ABAP_copy_directory(path_to_backup):
 	new_folder_exist = True
 
 	# check if the provided folder exist
-	if( os.path.isdir(path_to_backup) ):
-#		print "[+] Path: " + path_to_backup + " does exist."
-	else:
+	if( not os.path.isdir(path_to_backup) ):
 		print "[-] Error: " + path_to_backup + " doesn't exist."
 		return 0
 
@@ -61,11 +59,13 @@ def ABAP_copy_directory(path_to_backup):
 	except OSError as e:
 		print('Directory not copied. Error: %s' % e)
 
+'''
 	# verify if the backup was done correctly
-	if( filecmp.cmpfiles(path_to_backup, new_folder_name) ):
+	if( filecmp.cmpfiles(path_to_backup, new_folder_name, test) ):
 		print "[+] Verification: backup was done correctly."
 	else:
 		print "[-] Verification: failed"
+'''
 
 # START
 sid = select_sid()
