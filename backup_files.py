@@ -1,6 +1,7 @@
 import os
 import shutil
 import time
+import filecmp
 
 # Give to user the possible SID's so user can select the correct SID.
 def select_sid():
@@ -14,6 +15,8 @@ def select_sid():
 			possible_sid.append(element)
 
 	# print number + possible SID
+	print("Please select the correct SID of the system:")
+
 	for element in possible_sid:
 		print '(' + str(number) + ') ' + element
 		number = number + 1
@@ -34,7 +37,7 @@ def ABAP_copy_directory(path_to_backup):
 
 	# check if the provided folder exist
 	if( os.path.isdir(path_to_backup) ):
-		print "[+] Path: " + path_to_backup + " does exist."
+#		print "[+] Path: " + path_to_backup + " does exist."
 	else:
 		print "[-] Error: " + path_to_backup + " doesn't exist."
 		return 0
@@ -51,12 +54,18 @@ def ABAP_copy_directory(path_to_backup):
 	# create the backup
 	try:
 		shutil.copytree(path_to_backup, new_folder_name)
-		print "[+] Backup of: " + path_to_backup + " to: " + new_folder_name
+#		print "[+] Backup of: " + path_to_backup + " to: " + new_folder_name
+		print "[+] Backup created => " + new_folder_name
 	except shutil.Error as e:
 		print('Directory not copied. Error: %s' % e)
 	except OSError as e:
 		print('Directory not copied. Error: %s' % e)
 
+	# verify if the backup was done correctly
+	if( filecmp.cmpfiles(path_to_backup, new_folder_name) ):
+		print "[+] Verification: backup was done correctly."
+	else:
+		print "[-] Verification: failed"
 
 # START
 sid = select_sid()
