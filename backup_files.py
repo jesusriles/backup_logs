@@ -24,34 +24,47 @@ def select_sid():
 
 
 # Copy the work directories of ASCS01 and D00
-def ABAP_copy_directory():
+def ABAP_copy_directory(path_to_backup):
 
-	sid = select_sid()
 	current_date = time.strftime("%d%b%Y") # format example: 03Sep2018
+	new_folder_name = path_to_backup + '_backup_' + current_date 
+	tmp_new_folder_name = new_folder_name
+	number = 1
+	new_folder_exist = True
 
-	# backup /usr/sap/<sid>/ASCS01/work
-	logs_ascs = '/usr/sap/' + sid + '/ASCS01/work'
-	logs_ascs_backup = logs_ascs + '_backup_' + current_date
+	# check if the provided folder exist
+	if( os.path.isdir(path_to_backup) ):
+		print "[+] Path: " + path_to_backup + " does exist."
+	else:
+		print "[-] Error: " + path_to_backup + " doesn't exist."
+		return 0
 
-	if( os.path.isdir(logs_ascs) ):
-		try:
-			shutil.copytree(logs_ascs, logs_ascs_backup)
-		except shutil.Error as e:
-			print('Directory not copied. Error: %s' % e)
-		except OSError as e:
-			print('Directory not copied. Error: %s' % e)
+	# check if the folder to be created exist
+	while new_folder_exist:
+		if( os.path.isdir(new_folder_name) ):
+			new_folder_name = tmp_new_folder_name
+			new_folder_name = new_folder_name + '_' + str(number)
+			number = number + 1
+		else:
+			new_folder_exist = False
 
-	# backup /usr/sap/<sid>/D00/work
-	logs_d00 = '/usr/sap/' + sid + '/D00/work'
-	logs_d00_backup = logs_d00 + '_backup_' + current_date
+	# create the backup
+	try:
+		shutil.copytree(path_to_backup, new_folder_name)
+		print "[+] Backup of: " + path_to_backup + " to: " + new_folder_name
+	except shutil.Error as e:
+		print('Directory not copied. Error: %s' % e)
+	except OSError as e:
+		print('Directory not copied. Error: %s' % e)
 
-	if( os.path.isdir(logs_d00) ):
-		try:
-			shutil.copytree(logs_d00, logs_d00_backup)
-		except shutil.Error as e:
-			print('Directory not copied. Error: %s' % e)
-		except OSError as e:
-			print('Directory not copied. Error: %s' % e)
-# print supported solutions
 
-ABAP_copy_directory()
+# START
+sid = select_sid()
+
+# backup /usr/sap/<sid>/ASCS01/work
+logs_ascs = '/usr/sap/' + sid + '/ASCS01/work'
+ABAP_copy_directory(logs_ascs)
+
+# backup /usr/sap/<sid>/D00/work
+logs_d00 = '/usr/sap/' + sid + '/D00/work'
+ABAP_copy_directory(logs_d00)
